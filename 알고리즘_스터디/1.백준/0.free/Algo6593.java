@@ -29,7 +29,7 @@ public class Algo6593 {
 	static int[][][] dist;
 	static char[][][] map;
 	static boolean[][][] visit;
-	static PriorityQueue<Node> pq;
+	static Queue<Node> pq;
 	static Node start,end;
 	static int[] dx = {0,0,0,1,0,-1};
 	static int[] dy = {0,0,1,0,-1,0};
@@ -50,7 +50,7 @@ public class Algo6593 {
 			map = new char[L][R][C];
 			dist = new int[L][R][C];
 			visit = new boolean[L][R][C];
-			pq = new PriorityQueue<Node>();
+			pq = new LinkedList<Node>();
 			for(int i=0;i<L;i++) {
 				for(int j=0;j<R;j++) {
 					input = br.readLine().split("");
@@ -91,7 +91,6 @@ public class Algo6593 {
 		visit[start.z][start.y][start.x] = true;
 		while(!pq.isEmpty()) {
 			Node node = pq.poll();
-			System.out.println(node.z+" "+node.y+" "+node.x);
 			if(node.z == end.z && node.y == end.y && node.x == end.x) {
 				flag = true;
 				return;
