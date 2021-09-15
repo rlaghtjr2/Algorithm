@@ -1,93 +1,81 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
-public class Main {
-    static class Edge implements Comparable<Edge>{
-        int next;
-        int dist;
-        Edge(){ }
-        Edge( int n, int d){
-            this.next = n;
-            this.dist = d;
-        }
-
-        @Override
-        public int compareTo(Edge o) {
-            return this.dist - o.dist;
-        }
-    }
-    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static StringBuilder sb = new StringBuilder();
-    static boolean[] visit ;
-    static int[] dist;
-    static ArrayList<Edge> edges[];
-    static PriorityQueue<Edge> pq = new PriorityQueue<>(Collections.reverseOrder());
-
-    public static void main(String[] args) throws IOException {
-        int N = Integer.parseInt(br.readLine());
-        dist = new int[N+1];
-        visit = new boolean[N+1];
-        edges = new ArrayList[N+1];
-        for(int i=0; i<N+1; i++)
-            edges[i] = new ArrayList<Edge>();
-        for(int i = 0; i < N; ++i){
-            StringTokenizer st = new StringTokenizer(br.readLine(), " ");
-            int now = Integer.parseInt(st.nextToken());
-            while(st.hasMoreTokens()){
-                int nxt = Integer.parseInt(st.nextToken());
-                if(nxt == -1) break;
-                int d = Integer.parseInt(st.nextToken());
-                edges[now].add(new Edge(nxt, d));
-            }
-        }
-        br.close();
-        Arrays.fill(dist,Integer.MAX_VALUE);
-        dijkstra(1);
-
-        int idx = getIdx().get(0);
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        dijkstra(idx);
-        int mxd = getIdx().get(1);
-        sb.append(mxd).append('\n');
-        bw.write(sb.toString());
-        bw.flush();
-    }
-    static ArrayList<Integer> getIdx(){
-        int idx = -1;
-        int mxd = -1;
-        for(int i = 0; i < dist.length; ++i){
-            if(dist[i] == Integer.MAX_VALUE) continue;
-            if(mxd < dist[i]){
-                idx = i;
-                mxd = dist[i];
-            }
-        }
-        ArrayList<Integer> al = new ArrayList<>();
-        al.add(idx);
-        al.add(mxd);
-        return al;
-    }
-    static void dijkstra(int root) {
-        int ret = -1;
-        dist[root] = 0;
-        pq.add(new Edge(root, dist[root]));
-        while (!pq.isEmpty()) {
-            Edge e = pq.poll();
-            int dis = e.dist;
-            int nxt = e.next;
-            dist[nxt] = dis;
-            if (dist[nxt] < dis) continue;
-
-            for (int i = 0; i < edges[nxt].size(); ++i) {
-                Edge ed = edges[nxt].get(i);
-                if (dist[ed.next] > dis + ed.dist) {
-                    dist[ed.next] = dis + ed.dist;
-                    pq.add(new Edge(ed.next, dist[ed.next]));
-                }
-            }
-
-        }
-    }
-    
+class Node{
+	int num;
+	int weight;
+	
+	Node(int _num, int _weight){
+		num = _num;
+		weight = _weight;
+	}
+}
+public class Algo1167 {
+	static int V;
+	static List<Node>[] graph;
+	public static void main(String[] args) throws NumberFormatException, IOException {
+		// TODO Auto-generated method stub
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		V = Integer.parseInt(br.readLine());
+		
+		graph = new ArrayList[V+1];
+		for(int i=0;i<graph.length;i++) {
+			graph[i] = new ArrayList<>();
+		}
+		
+		for(int i=0;i<V;i++) {
+			String[] input = br.readLine().split(" ");
+			int current = Integer.parseInt(input[0]);
+			for(int j=1;j<input.length;j=j+2) {
+				int next = Integer.parseInt(input[j]);
+				if(next==-1) break;
+				int weight = Integer.parseInt(input[j+1]);
+				
+				graph[current].add(new Node(next,weight));
+			}
+		}
+		
+		int node = dfs(-1);
+		int answer = dfs(node);
+		System.out.println(answer);
+	}
+	public static int dfs(int num) {
+		int sum = 0;
+		int maxNode = 0;
+		Stack<Node> stk = new Stack<>();
+		boolean[] v = new boolean[V+1];
+		if(num==-1) {
+			stk.add(new Node(1,0));
+			v[1] = true;
+		}else {
+			stk.add(new Node(num,0));
+			v[num] = true;
+		}
+		
+		while(!stk.isEmpty()) {
+			Node current = stk.pop();
+//			System.out.println(current.num+ " " + current.weight);
+			v[current.num] = true;
+			if(current.weight>sum) {
+				sum = current.weight;
+				maxNode = current.num;
+			}
+			
+			for(Node next : graph[current.num]) {
+				if(v[next.num]) continue;
+				
+				v[next.num] = true;
+				stk.add(new Node(next.num,current.weight+next.weight));
+			}
+		}
+//		System.out.println("A" + maxNode+" " +sum);
+		
+		if(num==-1) return maxNode;
+		else return sum;
+//		return sum;
+	}
 }
