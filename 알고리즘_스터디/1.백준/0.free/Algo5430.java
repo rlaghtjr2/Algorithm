@@ -1,66 +1,57 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
-public class Main {
-
-    public static void main(String[] args) throws Exception {
+public class Algo5430 {
+	public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int T = pi(br.readLine());
-        for(int t=0; t<T; ++t) {
-            Deque<Integer> a = new LinkedList<>();
-            String command = br.readLine();
-            int n = pi(br.readLine());
-            String a_ = br.readLine();
-            a_ = a_.substring(1, a_.length()-1);
-            boolean front = true;
-            String[] aa = a_.split(",");
-            for(int i=0; i<n; ++i)
-                a.add(pi(aa[i]));
-            if(countChar(command, 'D') > n) {
-                System.out.print("error\n");
-            }
-            else {
-                for(int i=0; i<command.length(); ++i) {
-                    if(command.charAt(i)=='D') {
-                        if(front)
-                            a.pollFirst();
-                        else
-                            a.pollLast();
-                    }
-                    else {
-                        front = !front;
-                    }
-                    if(i==command.length()-1) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("[");
-                        if(front) {
-                            while(a.size()>1)
-                                sb.append(String.format("%d,", a.pollFirst()));
-                        }
-                        else {
-                            while(a.size()>1)
-                                sb.append(String.format("%d,", a.pollLast()));
-                        }
-                        if(a.size()!=0)
-                            sb.append(a.getFirst());
-                        sb.append("]");
-                        System.out.println(sb.toString());
-                    }
-                }
+        StringBuilder sb = new StringBuilder();
+        int T = Integer.parseInt(br.readLine());
 
-            }
+        while(T-- > 0) {
+            String commands = br.readLine();
+            int n = Integer.parseInt(br.readLine());  // 굳이 입력받지 않아도 되는 N
+            String str = br.readLine();
+            String[] arr = str.substring(1, str.length() - 1).split(",");
 
+            Deque<Integer> deque = new ArrayDeque<>();
+            for (String s : arr) {
+                if (!s.equals(""))
+                    deque.add(Integer.valueOf(s));
+            }
+            sb.append(process(deque, commands));
         }
-
+        System.out.println(sb.toString());
     }
-    static int pi(String a) {
-        return Integer.parseInt(a);
-    }
+	
+	public static String process(Deque<Integer> deque, String commands) {
+        boolean reverse = false;
 
-    public static long countChar(String str, char ch) {
-        return str.chars()
-                .filter(c -> c == ch)
-                .count();
+        int len = commands.length();
+        for(int i = 0; i < len; i++) {
+            char ch = commands.charAt(i);
+            if(ch == 'R') {
+                reverse = !reverse;
+            }else {
+                if (deque.size() == 0)
+                    return "error\n";
+                if (reverse)
+                    deque.removeLast();
+                else
+                    deque.removeFirst();
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        while (!deque.isEmpty()) {
+            sb.append(reverse ? deque.removeLast() : deque.removeFirst());
+            if (deque.size() != 0)
+                sb.append(",");
+        }
+        sb.append("]\n");
+
+        return sb.toString();
     }
 }
